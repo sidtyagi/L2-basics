@@ -1,0 +1,17 @@
+Let us assume a 3 switch topology (S1,S2,S3) as shown in stable topo.jpg.
+S1 is the root bridge,hence both its ports will be in Designated forwarding state.
+S2 receives BPDUs from the root bridge on 0/1 , hence 0/1 will be the root port.
+Similarly for S3 0/4 will be the root port.
+Under the assumption,S2 sends superior BPDUs , for the link segment L2 we have 0/2 as DP while 0/3 of S3 as ND(Non Designated) port
+
+SOftware related issues:
+Suppose due to some reason,the STP process on S2 is crashed.
+Initially S3 was receiving BPDUs from S2 on its non-designated port.Now,
+even though the link between S2 and S3 is up,still S3 is not receiving the BPDUs.Therefore,S3 will wait for Max age timer,which is 20 sec by default.
+Once,the timer expires,S3 will put its non-designated port to designated state and assume forwarding state,thereby triggering a loop scenario.
+
+Link failure between S1 and S2
+Let's assume, the link between s1 and S2 fails,the root port is physically down.
+In this case,S2 stops receiving BPDUs from the root bridge and immediately considers itself as the root bridge,thereby sending BPDUs towards S3.
+Since S3 is still receiving better BPDUs on its root port from S1,it will wait for the max-age timer to expire.In the meantime,it will continue to receive both inferior and superior BPDu.
+Once the max age timer expires,S3 transitions its non designated port to designated state and starts sending BPDUs to S2
